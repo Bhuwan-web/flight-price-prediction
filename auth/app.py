@@ -31,7 +31,7 @@ It supports:
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # type: ignore
     """Initialize application services."""
-    app.db = AsyncIOMotorClient(CONFIG.mongo_uri).account  # type: ignore[attr-defined]
+    app.db = AsyncIOMotorClient(CONFIG.mongo_uri).flight_price_predictor  # type: ignore[attr-defined]
     await init_beanie(
         app.db, document_models=[User, FlightRecordDB, Source, Destination, Airline]
     )  # type: ignore[arg-type,attr-defined]

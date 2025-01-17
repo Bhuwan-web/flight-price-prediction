@@ -61,7 +61,7 @@ async def delete_record(
 @router.get("/sources")
 async def source_keys() -> list:
     """Fetch all source keys"""
-    sources = await Source.find({}).to_list()
+    sources = await Source.find().to_list()
     if not sources:
         raise HTTPException(404, "No sources found")
     return [source.source for source in sources]
@@ -86,7 +86,27 @@ async def airline_keys() -> list:
 
 
 @router.post("/source")
-async def add_source(source: Source) -> Response:
-    """Add source keys"""
-    added_source = await source.create()
-    return Response(added_source, status_code=201)
+async def add_sources(sources: list[Source]) -> Response:
+    """Add source keys in bulk"""
+    await Source.insert_many(sources)
+    return JSONResponse(
+        content={"success": True, "message": "Sources added"}, status_code=201
+    )
+
+
+@router.post("/destination")
+async def add_destination(destinations: list[Destination]) -> Response:
+    """Add source keys in bulk"""
+    await Destination.insert_many(destinations)
+    return JSONResponse(
+        content={"success": True, "message": "Destinations added"}, status_code=201
+    )
+
+
+@router.post("/airline")
+async def add_airlines(airlines: list[Airline]) -> Response:
+    """Add source keys in bulk"""
+    await Airline.insert_many(airlines)
+    return JSONResponse(
+        content={"success": True, "message": "Airlines added"}, status_code=201
+    )
