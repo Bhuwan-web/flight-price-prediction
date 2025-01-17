@@ -9,7 +9,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from auth.config import CONFIG
 from auth.models.user import User
-from auth.models.flight_record import FlightRecordDB
+from auth.models.flight_record import FlightRecordDB, Source, Destination, Airline
 
 from auth.routes.auth import router as AuthRouter
 from auth.routes.mail import router as MailRouter
@@ -32,7 +32,9 @@ It supports:
 async def lifespan(app: FastAPI):  # type: ignore
     """Initialize application services."""
     app.db = AsyncIOMotorClient(CONFIG.mongo_uri).account  # type: ignore[attr-defined]
-    await init_beanie(app.db, document_models=[User, FlightRecordDB])  # type: ignore[arg-type,attr-defined]
+    await init_beanie(
+        app.db, document_models=[User, FlightRecordDB, Source, Destination, Airline]
+    )  # type: ignore[arg-type,attr-defined]
     print("Startup complete")
     yield
     print("Shutdown complete")
@@ -60,3 +62,13 @@ app.include_router(MailRouter)
 app.include_router(RegisterRouter)
 app.include_router(UserRouter)
 app.include_router(FlightRouter)
+
+
+@app.get("/")
+async def root():
+    """Return a friendly hello world message."""
+    return {
+        "success": "Server Up and Running",
+        "docs_url": "/docs",
+        "openapi_url": "/openapi.json",
+    }
