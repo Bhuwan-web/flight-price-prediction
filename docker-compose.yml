@@ -3,6 +3,7 @@ version: '3.4'
 
 services:
   flight-price-predictor:
+    container_name: flight-price-predictor
     image: flight-price-predictor
     build:
       context: .
@@ -14,6 +15,7 @@ services:
     ports:
       - 8000:8000
   mongodb:
+    container_name: mongodb
     image: mongo:6
     restart: always
     environment:
