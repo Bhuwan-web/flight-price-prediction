@@ -1,6 +1,5 @@
 """User router."""
 
-import random
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.responses import JSONResponse
@@ -9,7 +8,6 @@ from auth.models.flight_record import (
     Destination,
     FlightRecordDB,
     FlightRecordIn,
-    FlightRecordOut,
     Source,
 )
 from auth.models.user import User
