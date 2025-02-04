@@ -10,6 +10,7 @@ from auth.jwt import ACCESS_EXPIRES, REFRESH_EXPIRES
 class AccessToken(BaseModel):
     """Access token details."""
 
+    
     access_token: str
     access_token_expires: timedelta = ACCESS_EXPIRES
 

@@ -10,13 +10,13 @@ MONGO_PASSWORD := secret
 # Start the backend
 .PHONY: run_backend
 run_backend:
-	@docker compose -f $(COMPOSE_FILE) -p $(PROJECT_NAME) up -d
+	@docker compose -f $(COMPOSE_FILE) up -d --build
 	@echo "Backend is running."
 
 # Stop the backend
 .PHONY: stop_backend
 stop_backend:
-	@docker compose -f $(COMPOSE_FILE) -p $(PROJECT_NAME) down
+	@docker compose -f $(COMPOSE_FILE) down
 	@echo "Backend has stopped."
 
 # Load default data into MongoDB

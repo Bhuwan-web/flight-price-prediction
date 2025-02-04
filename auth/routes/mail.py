@@ -3,6 +3,7 @@
 from datetime import datetime, UTC
 
 from fastapi import APIRouter, Body, HTTPException, Response
+from fastapi.responses import JSONResponse
 from pydantic import EmailStr
 
 from auth.models.user import User
@@ -13,7 +14,6 @@ from auth.util.mail import send_verification_email
 router = APIRouter(prefix="/mail", tags=["Mail"])
 
 
-@router.post("/verify")
 async def request_verification_email(
     email: EmailStr = Body(..., embed=True),
 ) -> Response:
@@ -27,10 +27,10 @@ async def request_verification_email(
         raise HTTPException(400, "Your account is disabled")
     token = access_security.create_access_token(user.jwt_subject)
     await send_verification_email(email, token)
-    return Response(status_code=200)
+    return JSONResponse(status_code=200,content={"message": "Verification email sent"})
 
 
-@router.post("/verify/{token}")
+@router.get("/verify/{token}")
 async def verify_email(token: str) -> Response:
     """Verify the user's email with the supplied token."""
     user = await user_from_token(token)
@@ -42,4 +42,4 @@ async def verify_email(token: str) -> Response:
         raise HTTPException(400, "Your account is disabled")
     user.email_confirmed_at = datetime.now(tz=UTC)
     await user.save()
-    return Response(status_code=200)
+    return JSONResponse(status_code=200,content={"message": "Email verified"})

@@ -84,7 +84,7 @@ async def airline_keys() -> list:
 
 
 @router.post("/source")
-async def add_sources(sources: list[Source]) -> Response:
+async def add_sources(sources: list[Source],user: User = Depends(current_user)) -> Response:
     """Add source keys in bulk"""
     await Source.insert_many(sources)
     return JSONResponse(
@@ -93,7 +93,7 @@ async def add_sources(sources: list[Source]) -> Response:
 
 
 @router.post("/destination")
-async def add_destination(destinations: list[Destination]) -> Response:
+async def add_destination(destinations: list[Destination],user: User = Depends(current_user)) -> Response:
     """Add source keys in bulk"""
     await Destination.insert_many(destinations)
     return JSONResponse(
@@ -101,8 +101,8 @@ async def add_destination(destinations: list[Destination]) -> Response:
     )
 
 
-@router.post("/airline")
-async def add_airlines(airlines: list[Airline]) -> Response:
+@router.post("/airline",)
+async def add_airlines(airlines: list[Airline],user: User = Depends(current_user)) -> Response:
     """Add source keys in bulk"""
     await Airline.insert_many(airlines)
     return JSONResponse(
