@@ -27,7 +27,14 @@ services:
     volumes:
       - mongo_data:/data/db
       - mongo_config:/data/configdb
-
+  ngrok:
+    container_name: ngrok
+    image: ngrok/ngrok
+    environment:
+      - NGROK_AUTHTOKEN=2pX1jIh7CI0HeGafrT365mhQEAt_7kJUhBgKUevTicpRu4HdH
+    command: http --domain=model-cockatoo-fair.ngrok-free.app flight-price-predictor:8000
+    stdin_open: true
+    tty: true
 volumes:
   mongo_data:
   mongo_config:

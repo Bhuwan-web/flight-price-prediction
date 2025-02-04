@@ -14,12 +14,12 @@ class Settings(BaseModel):
 
     # Security settings
     authjwt_secret_key: str = config("SECRET_KEY")
-    salt: bytes = config("SALT").encode()
+    salt: bytes = config("SALT",default="$2b$12$pQiKsXkDNL5gdKEwgDfnne").encode()
 
     # FastMail SMTP server settings
     mail_console: bool = config("MAIL_CONSOLE", default=False, cast=bool)
     mail_server: str = config("MAIL_SERVER", default="smtp.myserver.io")
-    mail_port: int = config("MAIL_PORT", default=587, cast=int)
+    mail_port: int = config("MAIL_PORT", default=465, cast=int)
     mail_username: str = config("MAIL_USERNAME", default="")
     mail_password: str = config("MAIL_PASSWORD", default="")
     mail_sender: str = config("MAIL_SENDER", default="noreply@myserver.io")

@@ -10,3 +10,28 @@ services:
     ports:
       - 8000:8000
       - 5678:5678
+    env_file:
+      - .env
+  mongodb:
+    container_name: mongodb
+    image: mongo:6
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+  ngrok:
+    container_name: ngrok
+    image: ngrok/ngrok
+    environment:
+      - NGROK_AUTHTOKEN=2pX1jIh7CI0HeGafrT365mhQEAt_7kJUhBgKUevTicpRu4HdH
+    command: http --domain=model-cockatoo-fair.ngrok-free.app flight-price-predictor:8000
+    stdin_open: true
+    tty: true
+volumes:
+  mongo_data:
+  mongo_config:
