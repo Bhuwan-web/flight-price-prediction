@@ -1,4 +1,5 @@
 
+import json
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.responses import JSONResponse
@@ -25,15 +26,15 @@ async def book_flight(flight_booking: FlightBooking,user: User = Depends(current
         raise HTTPException(404, "No flight info found")
     if flight_record.booked:
         raise HTTPException(400, "Flight already booked")
-    if not flight_record.user_id:
-        flight_record.user_id = user.id
+    if not flight_booking.user_id:
+        flight_booking.user_id = user.id
     flight_record_db = await FlightBooking.create(flight_booking)
     flight_record.booked = True
     await flight_record.save()
     booking_details = await get_booking_details(user.id,flight_booking.flight_id,flight_booking)  
     await send_booking_email(booking_details)
     return JSONResponse(
-        content={"success": True, "message": "Flight booked", "data": jsonable_encoder(flight_record_db.model_dump())}, status_code=201
+        content={"success": True, "message": "Flight booked", "data": json.loads(flight_record_db.model_dump_json())}, status_code=201
     )
 
 
@@ -47,23 +48,18 @@ async def get_flight_info(flight_id: str, user: User = Depends(current_user)):
         raise HTTPException(404, "No flight info found")
     return JSONResponse(content={"success": True, "data": jsonable_encoder(FlightRecordOut.model_validate(flight_record_db.model_dump()))},status_code=200)
 
-@router.post("/cancel/{flight_id}")
-async def cancel_flight_booking(flight_id: str, user: User = Depends(current_user)) -> Response:
+@router.post("/cancel")
+async def cancel_flight_booking(booking_id: str, user: User = Depends(current_user)) -> Response:
     """Cancel a flight booking"""
-    flight_record = await FlightRecordDB.find_one(
-        FlightRecordDB.user_id == user.id, FlightRecordDB.id == ObjectId(flight_id)
-    )
-    if flight_record is None:
-        raise HTTPException(404, "No flight info found")
-    booking=await FlightBooking.find_one(FlightBooking.flight_id==flight_id)
+
+    booking=await FlightBooking.find_one(FlightBooking.user_id == ObjectId(user.id),FlightBooking.id==ObjectId(booking_id))
     if not booking:
         raise HTTPException(404, "No booking found")
     if booking.cancelled:
         raise HTTPException(400, "Flight already cancelled")
     booking.cancelled = True
     await booking.save()
-    flight_booking = await FlightBooking.find_one(FlightBooking.flight_id==flight_id)
-    booking_details = await get_booking_details(user.id,flight_id,flight_booking)
+    booking_details = await get_booking_details(user.id,booking.flight_id,booking)
     if not booking_details:
         raise HTTPException(404, "No booking details found")
     await send_cancellation_email(booking_details)
