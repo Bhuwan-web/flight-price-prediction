@@ -77,4 +77,4 @@ async def get_booked_flights_logs(user: User = Depends(current_user)) -> list:
     flight_records = await FlightRecordDB.find(  # noqa: F821
         FlightRecordDB.user_id == user.id, FlightRecordDB.booked == True  # noqa: E712
     ).to_list()
-    return [FlightRecordOut.model_validate(flight_record.model_dump()) for flight_record in flight_records]
+    return JSONResponse(content={"success": True, "data": jsonable_encoder(flight_records)},status_code=200)
