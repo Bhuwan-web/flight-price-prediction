@@ -26,7 +26,7 @@ async def destination_keys() -> list:
     destinations = await Destination.find().to_list()
     if destinations is None:
         raise HTTPException(404, "No destinations found")
-    return [destination.destination for destination in destinations]
+    return JSONResponse(content={"data":[destination.destination for destination in destinations],"success":True},status_code=200)
 
 
 @router.get("/airlines")
@@ -35,7 +35,7 @@ async def airline_keys() -> list:
     airlines = await Airline.find().to_list()
     if airlines is None:
         raise HTTPException(404, "No airlines found")
-    return [airline.airline for airline in airlines]
+    return JSONResponse(content={"data":[airline.airline for airline in airlines],"success":True},status_code=200)
 
 
 @router.post("/source")

@@ -41,9 +41,9 @@ async def predict_flight_price(flight_record: FlightRecordIn, user: User = Depen
 async def flight_logs(user: User = Depends(current_user)) -> list:  # type: ignore[no-untyped-def]
     """Update allowed user fields."""
     flight_records = await FlightRecordDB.find(
-        FlightRecordDB.user_id == user.id,FlightRecordDB.cancelled == False  # noqa: E712
+        FlightRecordDB.user_id == user.id,FlightRecordDB.booked == False  # noqa: E712
     ).to_list()
-    return flight_records
+    return JSONResponse(content={"success": True, "data": jsonable_encoder(flight_records)},status_code=200)  # noqa: E712flight_records
 
 
 @router.delete("/delete/{id}")
@@ -58,7 +58,7 @@ async def delete_record(
     if record is None:
         raise HTTPException(404, "No record found")
     await record.delete()
-    return Response(status_code=204)
+    return JSONResponse(content={"success": True, "message": "Record deleted"},status_code=204)
 
 
 
