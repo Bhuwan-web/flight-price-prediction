@@ -14,6 +14,6 @@ async def get_booking_details(user_id:str,flight_id:str,booking_details:FlightBo
 
     if flight_record is None:
         raise HTTPException(404, "Flight record not found")
-    data={"user_id":flight_record.user_id,"email":email,"user_name":booking_details.user_name,"phone_number":booking_details.phone_number,"flight_id":str(flight_record.id),"airline":flight_record.airline,"origin":flight_record.origin,"destination":flight_record.destination,"departure_time":flight_record.departure_time,"arrival_time":flight_record.arrival_time,"transit_count":flight_record.transit_count,"predicted_price":flight_record.predicted_price,}
+    data={"booking_id":str(booking_details.id),"user_id":flight_record.user_id,"email":email,"user_name":booking_details.user_name,"phone_number":booking_details.phone_number,"flight_id":str(flight_record.id),"airline":flight_record.airline,"origin":flight_record.origin,"destination":flight_record.destination,"departure_time":flight_record.departure_time,"arrival_time":flight_record.arrival_time,"transit_count":flight_record.transit_count,"predicted_price":flight_record.predicted_price,}
     return FlightBookingDetails(**data)
     

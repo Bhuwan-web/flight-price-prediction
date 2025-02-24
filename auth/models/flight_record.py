@@ -126,6 +126,7 @@ class FlightBooking(Document):
         return value
 
 class FlightBookingDetails(BaseModel):
+    booking_id: str
     user_name: str
     email: str
     phone_number: str

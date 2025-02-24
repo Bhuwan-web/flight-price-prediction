@@ -38,7 +38,7 @@ async def book_flight(flight_booking: FlightBooking,user: User = Depends(current
     )
 
 
-@router.get("/info/{flight_id}")
+@router.post("/info/{flight_id}")
 async def get_flight_info(flight_id: str, user: User = Depends(current_user)):
     """Get flight info from logs based on flight_id"""
     flight_record_db = await FlightRecordDB.find_one(
@@ -67,10 +67,20 @@ async def cancel_flight_booking(booking_id: str, user: User = Depends(current_us
         content={"success": True, "message": "Flight booking cancelled"}, status_code=200
     )
 
-@router.get("/booked/logs")
+@router.post("/booked/logs")
 async def get_booked_flights_logs(user: User = Depends(current_user)) -> list:
     """Get booked flights logs"""
-    flight_records = await FlightRecordDB.find(  # noqa: F821
-        FlightRecordDB.user_id == user.id, FlightRecordDB.booked == True  # noqa: E712
+    flight_records = await FlightBooking.find(  # noqa: F821
+        FlightBooking.user_id == user.id  # noqa: E712
     ).to_list()
-    return JSONResponse(content={"success": True, "data": jsonable_encoder(flight_records)},status_code=200)
+    result = []
+    for record in flight_records:
+        flight_details = await FlightRecordDB.find_one(FlightRecordDB.id == ObjectId(record.flight_id))
+        result.append({
+            "_id": str(record.id),
+            "user_id": str(record.user_id),
+            "flight_id": str(record.flight_id),
+            "cancelled": record.cancelled,
+            "flight_details": flight_details
+        })
+    return JSONResponse(content={"success": True, "data":jsonable_encoder(result)},status_code=200)
