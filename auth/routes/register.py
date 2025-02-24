@@ -43,7 +43,7 @@ async def forgot_password(email: EmailStr = embed) -> Response:
     return Response(status_code=200)
 
 
-@router.post("/reset-password/{token}", response_model=UserOut)
+@router.post("/reset-password", response_model=UserOut)
 async def reset_password(token: str, password: str = Body(..., embed=True)):  # type: ignore[no-untyped-def]
     """Reset user password from token value."""
     user = await user_from_token(token)
@@ -55,4 +55,4 @@ async def reset_password(token: str, password: str = Body(..., embed=True)):  # 
         raise HTTPException(400, "Your account is disabled")
     user.password = hash_password(password)
     await user.save()
-    return user
+    return JSONResponse(status_code=200, content={"success": True,"message": "Password reset successful"})
