@@ -1,7 +1,7 @@
 from beanie import Document, PydanticObjectId
 from datetime import datetime
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator, root_validator, validator
 
 from bson import ObjectId
 
@@ -123,7 +123,21 @@ class FlightBookingInput(BaseModel):
         return value
 
 class FlightBookingRecord(FlightBookingInput,Document):
-    total_price: float
+    total_price: float=0
+
+    
+    @model_validator(mode='after')
+    def total_price_must_not_be_zero(cls, values):
+        if 'total_price' in values and values['total_price'] == 0:
+            flight_record:FlightRecordDB = FlightRecordDB.find_one(FlightRecordDB.id == values['flight_id']).run_sync()
+            if not flight_record:
+                raise ValueError("Flight record not found")
+            predicted_price = flight_record.predicted_price
+            values['total_price'] = values['quantity'] *predicted_price
+        return values
+    
+    
+    
     class Settings:
         name = "bookings"
     
