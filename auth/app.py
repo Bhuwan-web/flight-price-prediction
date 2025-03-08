@@ -9,7 +9,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from auth.config import CONFIG
 from auth.models.user import User
-from auth.models.flight_record import FlightBooking, FlightRecordDB, Source, Destination, Airline
+from auth.models.flight_record import  FlightBookingRecord, FlightRecordDB, Source, Destination, Airline
 
 from auth.routes.auth import router as AuthRouter
 from auth.routes.mail import router as MailRouter
@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI):  # type: ignore
     """Initialize application services."""
     app.db = AsyncIOMotorClient(CONFIG.mongo_uri).flight_price_predictor  # type: ignore[attr-defined]
     await init_beanie(
-        app.db, document_models=[User, FlightRecordDB, Source, Destination, Airline,FlightBooking]
+        app.db, document_models=[User, FlightRecordDB, Source, Destination, Airline,FlightBookingRecord]
     )  # type: ignore[arg-type,attr-defined]
     print("Startup complete")
     yield

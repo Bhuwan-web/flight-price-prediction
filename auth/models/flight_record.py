@@ -99,7 +99,7 @@ class Destination(Document):
         name = "destinations"
 
 
-class FlightBooking(Document):
+class FlightBookingInput(BaseModel):
     """Bookings Document."""
 
     flight_id: PydanticObjectId
@@ -110,9 +110,6 @@ class FlightBooking(Document):
     quantity: int = 1
     created_at: datetime = datetime.now()
     cancelled: bool = False
-
-    class Settings:
-        name = "bookings"
     @field_validator('phone_number')
     def phone_number_must_be_10_digits(cls, value):
         if len(value) != 10:
@@ -125,6 +122,11 @@ class FlightBooking(Document):
             raise ValueError('Name must be at least 2 characters long')
         return value
 
+class FlightBookingRecord(FlightBookingInput,Document):
+    total_price: float
+    class Settings:
+        name = "bookings"
+    
 class FlightBookingDetails(BaseModel):
     booking_id: str
     user_name: str
@@ -139,6 +141,7 @@ class FlightBookingDetails(BaseModel):
     transit_count: int
     predicted_price: float
     quantity: int = 1
+    total_price: float
 
     class Config:
         json_schema_extra = {

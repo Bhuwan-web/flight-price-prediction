@@ -200,8 +200,6 @@ async def send_cancellation_email(flight_record: FlightBookingDetails) -> None:
     departure_time = flight_record.departure_time.strftime("%Y-%m-%d %H:%M")
     arrival_time = flight_record.arrival_time.strftime("%Y-%m-%d %H:%M")
 
-    # Calculate the total price based on quantity
-    total_price = flight_record.predicted_price * flight_record.quantity
 
     # Create the HTML email body
     email_body = f"""
@@ -264,7 +262,7 @@ async def send_cancellation_email(flight_record: FlightBookingDetails) -> None:
                 <p><strong>Transit Count:</strong> {flight_record.transit_count}</p>
                 <p><strong>Predicted Price per Ticket:</strong> ₹{flight_record.predicted_price:.2f}</p>
                 <p><strong>Quantity:</strong> {flight_record.quantity}</p>
-                <p class="total-price"><strong>Total Price Refunded:</strong> ₹{total_price:.2f}</p>
+                <p class="total-price"><strong>Total Price Refunded:</strong> ₹{flight_record.total_price:.2f}</p>
             </div>
 
             <p>If you did not request this cancellation, please contact us immediately at <a href="mailto:support@flightpriceprediction.com">support@flightpriceprediction.com</a>.</p>
