@@ -1,7 +1,7 @@
 from beanie import Document, PydanticObjectId
 from datetime import datetime
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator, root_validator, validator
 
 from bson import ObjectId
 
@@ -99,7 +99,7 @@ class Destination(Document):
         name = "destinations"
 
 
-class FlightBooking(Document):
+class FlightBookingInput(BaseModel):
     """Bookings Document."""
 
     flight_id: PydanticObjectId
@@ -110,9 +110,6 @@ class FlightBooking(Document):
     quantity: int = 1
     created_at: datetime = datetime.now()
     cancelled: bool = False
-
-    class Settings:
-        name = "bookings"
     @field_validator('phone_number')
     def phone_number_must_be_10_digits(cls, value):
         if len(value) != 10:
@@ -125,6 +122,25 @@ class FlightBooking(Document):
             raise ValueError('Name must be at least 2 characters long')
         return value
 
+class FlightBookingRecord(FlightBookingInput,Document):
+    total_price: float=0
+
+    
+    @model_validator(mode='after')
+    def total_price_must_not_be_zero(cls, values):
+        if 'total_price' in values and values['total_price'] == 0:
+            flight_record:FlightRecordDB = FlightRecordDB.find_one(FlightRecordDB.id == values['flight_id']).run_sync()
+            if not flight_record:
+                raise ValueError("Flight record not found")
+            predicted_price = flight_record.predicted_price
+            values['total_price'] = values['quantity'] *predicted_price
+        return values
+    
+    
+    
+    class Settings:
+        name = "bookings"
+    
 class FlightBookingDetails(BaseModel):
     booking_id: str
     user_name: str
@@ -139,6 +155,7 @@ class FlightBookingDetails(BaseModel):
     transit_count: int
     predicted_price: float
     quantity: int = 1
+    total_price: float
 
     class Config:
         json_schema_extra = {
